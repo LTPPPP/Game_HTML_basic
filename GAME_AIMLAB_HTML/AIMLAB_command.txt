@@ -1,0 +1,2 @@
+Based on the "aim lab" application, I built a game for me, hover over the red circle and click to add points, the red circle appears randomly, press the start button to start the game, playing time is 1 minute, if you miss, 1 point will be deducted
+html,css,js

@@ -1,0 +1,3 @@
+prompt: "Build for me a 'Tetris" game with 10 cell rows, 20 cells as columns, press enter to play and play again. press the key down to drop an object, press the right key to go right, and press the left key to go left. press the up key to rotate when filling 10 cells with a row then disappear that row, make the object random, and drop down, the object must be in a board game. the object will fall out by gravity when the object dropped then create a random new one,when create object, display it with pink"
+write a logic game for me
+HTML, CSS, JS

@@ -1,0 +1,333 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>15 Puzzle</title>
+</head>
+
+<body>
+    <div id="wrapper">
+        <div id="container">
+            <h1>Puzzle 15</h1>
+            <div id="board-time">00:00</div>
+            <div id="container-play">
+                <a id="play" href="javascript:void(0)">Click to play</a>
+            </div>
+            <div id="alert_puzzle"></div>
+            <div id="puzzle">
+                <div number="1" class="cell-puzzle row-1 col-1">1</div>
+                <div number="2" class="cell-puzzle row-1 col-2">2</div>
+                <div number="3" class="cell-puzzle row-1 col-3">3</div>
+                <div number="4" class="cell-puzzle row-1 col-4">4</div>
+                <div number="5" class="cell-puzzle row-2 col-1">5</div>
+                <div number="6" class="cell-puzzle row-2 col-2">6</div>
+                <div number="7" class="cell-puzzle row-2 col-3">7</div>
+                <div number="8" class="cell-puzzle row-2 col-4">8</div>
+                <div number="9" class="cell-puzzle row-3 col-1">9</div>
+                <div number="10" class="cell-puzzle row-3 col-2">10</div>
+                <div number="11" class="cell-puzzle row-3 col-3">11</div>
+                <div number="12" class="cell-puzzle row-3 col-4">12</div>
+                <div number="13" class="cell-puzzle row-4 col-1">13</div>
+                <div number="14" class="cell-puzzle row-4 col-2">14</div>
+                <div number="15" class="cell-puzzle row-4 col-3">15</div>
+                <div number="0" class="cell-puzzle row-4 col-4 cell-puzzle-zero"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<style>
+    * {
+        padding: 0px;
+        margin: 0px;
+    }
+
+    html {
+        width: 100%;
+        height: 100%;
+    }
+
+    body {
+        height: 100%;
+        width: 100%;
+    }
+
+    html>body {
+        height: 100%;
+    }
+
+    #wrapper {
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    #wrapper a {
+        text-align: center;
+    }
+
+    #container {
+        font-size: 16px;
+        width: 300px;
+        margin: 50px auto 0;
+        text-align: center;
+    }
+
+    #container h1 {
+        color: #276D8C;
+    }
+
+    #puzzle {
+        height: 242px;
+        width: 242px;
+        position: relative;
+        border: 2px solid #757575;
+        margin: 0 auto 25px;
+    }
+
+    #puzzle .cell-puzzle {
+        width: 58px;
+        height: 58px;
+        border: 2px solid white;
+        position: absolute;
+        text-align: center;
+        vertical-align: middle;
+        line-height: 20px;
+        font-size: 36px;
+        line-height: 60px;
+        background-color: #3B9AFF;
+        z-index: 100;
+        cursor: pointer;
+    }
+
+    #puzzle .cell-puzzle-zero {
+        background-color: white !important;
+        z-index: 50;
+    }
+
+    #puzzle>.row-1 {
+        top: 0;
+    }
+
+    #puzzle>.row-2 {
+        top: 60px;
+    }
+
+    #puzzle>.row-3 {
+        top: 120px;
+    }
+
+    #puzzle>.row-4 {
+        top: 180px;
+    }
+
+    #puzzle>.col-1 {
+        left: 0;
+    }
+
+    #puzzle>.col-2 {
+        left: 60px;
+    }
+
+    #puzzle>.col-3 {
+        left: 120px;
+    }
+
+    #puzzle>.col-4 {
+        left: 180px;
+    }
+
+    #container-play {
+        margin: 10px 0;
+        text-align: center;
+        height: 50px;
+    }
+
+    #play {
+        width: 150px;
+        height: 50px;
+        border: 2px solid #3f4f2e;
+        text-align: center;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 20px;
+        background-color: #689b37;
+        display: inline-block;
+        color: white;
+        text-align: center;
+        line-height: 48px;
+        border-radius: 3px;
+    }
+
+    #alert_puzzle {
+        font-size: 16px;
+        color: coral;
+    }
+</style>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script>
+    // ma trận toàn cục điều khiển mọi hoạt động của game
+    var matrix = [
+        [1, 2, 3, 4],
+        [5, 6, 7, 8],
+        [9, 10, 11, 12],
+        [13, 14, 15, 0],
+    ];
+
+    // các biến toàn cục dùng để tính giờ
+    var secs = 0;
+    var currentSeconds = 0;
+    var currentMinutes = 0;
+    var timer;
+
+    // gọi sự kiện bắt đầu game khi ấn nút play
+    $("#play").bind("click", function () {
+        initialize();
+        beginTime();
+        $("#alert_puzzle").text("");
+    })
+
+    // Khi click vào 1 sô thì gọi đến hàm move để di chuyển
+    $("#puzzle .cell-puzzle").bind("click", function () {
+        if (secs > 0) {
+            var obj = $(this);
+            move(obj);
+        }
+    })
+
+    // hàm init game, gọi 1 dãy số từ 1 đến 15 bất kì, sắp xếp các element theo dãy số đó để bắt đầu game
+    function initialize() {
+        var arrRandomNumber = shuffleMatrix();
+
+        var count = 0;
+        for (var i = 0; i < 4; i++) {
+            for (var j = 0; j < 4; j++) {
+                var number = arrRandomNumber[count];
+                matrix[i][j] = number;
+
+                if (i == 3 && j == 3) {
+                    matrix[i][j] = 0;
+                }
+
+                $("#puzzle .cell-puzzle[number=" + number + "]").css("top", i * 60 + "px");
+                $("#puzzle .cell-puzzle[number=" + number + "]").css("left", j * 60 + "px");
+                count++;
+            }
+        }
+    }
+
+    // hàm tạo dãy số bất kì từ 1 đến 15
+    function shuffleMatrix() {
+        var arr = [];
+        while (arr.length < 15) {
+            var r = Math.floor(Math.random() * 15) + 1;
+            if (arr.indexOf(r) === -1) arr.push(r);
+        }
+
+        return arr;
+    }
+
+    // hàm bắt đầu đếm giờ
+    function beginTime() {
+        secs = 0;
+        currentSeconds = 0;
+        currentMinutes = 0;
+        clearTimeout(timer);
+        intervalTime();
+    }
+
+    // hàm đếm giờ
+    function intervalTime() {
+        currentMinutes = Math.floor(secs / 60);
+        currentSeconds = secs % 60;
+
+        if (currentMinutes <= 9) {
+            currentMinutes = "0" + currentMinutes;
+        }
+
+        if (currentSeconds <= 9) {
+            currentSeconds = "0" + currentSeconds;
+        }
+
+        secs++;
+        $("#board-time").text(currentMinutes + ":" + currentSeconds);
+        timer = setTimeout('intervalTime()', 1000);
+        console.log(secs);
+    }
+
+    // hàm di chuyển các ô.
+    function move(obj) {
+        var numberCell = parseFloat(obj.attr("number"));
+        var win = false;
+
+        for (var i = 0; i < 4; i++) {
+            for (var j = 0; j < 4; j++) {
+                if (matrix[i][j] == numberCell) {
+                    if (j > 0 && matrix[i][j - 1] == 0) {
+                        $("#puzzle .cell-puzzle[number=0]").css("left", j * 60 + "px");
+                        obj.animate({
+                            'left': (j - 1) * 60 + 'px'
+                        }, 300);
+
+                        matrix[i][j - 1] = numberCell;
+                        matrix[i][j] = 0;
+
+                    } else if (j < 3 && matrix[i][j + 1] == 0) {
+                        $("#puzzle .cell-puzzle[number=0]").css("left", j * 60 + "px");
+                        obj.animate({
+                            'left': (j + 1) * 60 + 'px'
+                        }, 300);
+
+                        matrix[i][j + 1] = numberCell;
+                        matrix[i][j] = 0;
+
+                    } else if (i > 0 && matrix[i - 1][j] == 0) {
+                        $("#puzzle .cell-puzzle[number=0]").css("top", i * 60 + "px");
+                        obj.animate({
+                            'top': (i - 1) * 60 + 'px'
+                        }, 300);
+
+                        matrix[i - 1][j] = numberCell;
+                        matrix[i][j] = 0;
+
+                    } else if (i < 3 && matrix[i + 1][j] == 0) {
+                        $("#puzzle .cell-puzzle[number=0]").css("top", i * 60 + "px");
+                        obj.animate({
+                            'top': (i + 1) * 60 + 'px'
+                        }, 300);
+
+                        matrix[i + 1][j] = numberCell;
+                        matrix[i][j] = 0;
+                    }
+
+                    win = checkWin();
+                    if (win) {
+                        break;
+                    }
+
+                    return;
+                }
+            }
+        }
+    }
+
+    // hàm kiểm tra và báo chiến thắng
+    function checkWin() {
+        var winner = false;
+        var winString = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0";
+        var loseString = "1,2,3,4,5,6,7,8,9,10,11,12,13,15,14,0";
+
+        var matrixStr = matrix.toString();
+
+        if (winString == matrixStr) {
+            clearTimeout(timer);
+            $("#alert_puzzle").text("Bạn đã chiến thắng. Kỷ lục của bạn là " + $("#board-time").text());
+
+        } else if (loseString == matrixStr) {
+            $("#alert_puzzle").text('Bạn không có hy vọng để chiến thắng. Ấn nút "click to play" để chơi game mới');
+        }
+    }
+</script>
+
+</html>

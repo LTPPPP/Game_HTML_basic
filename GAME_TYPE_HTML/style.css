@@ -1,0 +1,27 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+.container {
+    margin-top: 50px;
+}
+
+#game-container {
+    margin-top: 20px;
+}
+
+#word {
+    font-size: 24px;
+}
+
+#input {
+    font-size: 20px;
+    margin-top: 10px;
+    padding: 5px;
+}
+
+#score,
+#time {
+    margin-top: 20px;
+}

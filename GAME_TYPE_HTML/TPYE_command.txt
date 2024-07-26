@@ -1,0 +1,5 @@
+Based on the website "monkeytype.com", create a game of inputting words from the keyboard, press tab to start the game, make a difference of 100 words, press enter to send, within 30 seconds count how many words are correct ,display text according to random
+Shows the score and countdown timer at the top at the start of the game
+
+
+html.css.js

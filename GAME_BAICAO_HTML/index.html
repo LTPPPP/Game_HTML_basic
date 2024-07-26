@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Game</title>
+    <style>
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            width: 100px;
+            height: 150px;
+            border: 1px solid black;
+            margin: 0 10px;
+            text-align: center;
+            line-height: 150px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .card.open {
+            background-color: lightgray;
+        }
+
+        .player {
+            padding: 0 100px;
+        }
+
+        .sum {
+            font-size: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="player">
+            <div class="card" id="p1card1" onclick="openCard('p1card1', 'p1score')"></div>
+            <div class="card" id="p1card2" onclick="openCard('p1card2', 'p1score')"></div>
+            <div class="card" id="p1card3" onclick="openCard('p1card3', 'p1score')"></div>
+            <div class="sum">Player 1 Score: <span id="p1score">0</span></div>
+        </div>
+        <div class="player">
+            <div class="card" id="p2card1" onclick="openCard('p2card1', 'p2score')"></div>
+            <div class="card" id="p2card2" onclick="openCard('p2card2', 'p2score')"></div>
+            <div class="card" id="p2card3" onclick="openCard('p2card3', 'p2score')"></div>
+            <div class="sum">Player 2 Score: <span id="p2score">0</span></div>
+        </div>
+        <div class="result-overlay" style="display: none;">
+            <div class="result-content">
+                <h2 id="winner-message"></h2>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let deck = [];
+        let currentPlayer = 1;
+
+        // Function to initialize the deck
+        function initializeDeck() {
+            for (let i = 2; i <= 10; i++) {
+                deck.push(i);
+            }
+            deck.push('J', 'Q', 'K', 'A');
+        }
+
+        // Function to shuffle the deck
+        function shuffleDeck() {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+
+        function openCard(cardId, scoreId) {
+            const card = document.getElementById(cardId);
+            if (!card.classList.contains('open')) {
+                const scoreElement = document.getElementById(scoreId);
+                const cardValue = deck.pop();
+                let score = parseInt(scoreElement.innerText);
+                if (cardValue === 'A') {
+                    score = 1;
+                } else if (['J', 'Q', 'K'].includes(cardValue)) {
+                    score += 10; // These cards add 10 points
+                } else {
+                    score += cardValue;
+                }
+                score = score % 10; // Take the last digit of the total score
+                scoreElement.innerText = score;
+                card.innerText = cardValue;
+                card.classList.add('open');
+                checkWinner();
+            }
+        }
+
+
+        // Function to check if all cards are open
+        function allCardsOpen() {
+            const cards = document.querySelectorAll('.card');
+            for (let card of cards) {
+                if (!card.classList.contains('open')) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Function to check the winner
+        function checkWinner() {
+            if (allCardsOpen()) {
+                const p1score = parseInt(document.getElementById('p1score').innerText);
+                const p2score = parseInt(document.getElementById('p2score').innerText);
+                let winnerMessage;
+                if (p1score > p2score) {
+                    winnerMessage = "Player 1 wins!";
+                } else if (p2score > p1score) {
+                    winnerMessage = "Player 2 wins!";
+                } else {
+                    winnerMessage = "It's a tie!";
+                }
+                document.getElementById('winner-message').innerText = winnerMessage;
+                document.querySelector('.result-overlay').style.display = 'block';
+
+            }
+        }
+
+
+
+        // Function to start the game
+        function startGame() {
+            initializeDeck();
+            shuffleDeck();
+        }
+
+        startGame();
+    </script>
+</body>
+
+</html>

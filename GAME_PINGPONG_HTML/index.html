@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Pong 2D</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #333;
+            color: white;
+        }
+
+        canvas {
+            border: 2px solid white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="pingPongCanvas" width="800" height="400"></canvas>
+    <button id="startButton">Start</button>
+
+    <script>
+        const canvas = document.getElementById('pingPongCanvas');
+        const ctx = canvas.getContext('2d');
+        const startButton = document.getElementById('startButton');
+
+        const paddleWidth = 100;
+        const paddleHeight = 10;
+        const paddleSpeed = 7;
+
+        let ball = {
+            x: canvas.width / 2,
+            y: canvas.height - 30,
+            dx: 2,
+            dy: -2,
+            radius: 10
+        };
+
+        let paddle = {
+            x: (canvas.width - paddleWidth) / 2,
+            y: canvas.height - paddleHeight,
+            width: paddleWidth,
+            height: paddleHeight
+        };
+
+        let rightPressed = false;
+        let leftPressed = false;
+
+        let score = 0;
+        let gameStarted = false;
+
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function drawPaddle() {
+            ctx.beginPath();
+            ctx.rect(paddle.x, paddle.y, paddle.width, paddle.height);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function drawScore() {
+            ctx.font = '16px Arial';
+            ctx.fillStyle = 'white';
+            ctx.fillText('Score: ' + score, 10, 20);
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBall();
+            drawPaddle();
+            drawScore();
+
+            if (rightPressed && paddle.x < canvas.width - paddle.width) {
+                paddle.x += paddleSpeed;
+            } else if (leftPressed && paddle.x > 0) {
+                paddle.x -= paddleSpeed;
+            }
+
+            if (ball.x + ball.dx > canvas.width - ball.radius || ball.x + ball.dx < ball.radius) {
+                ball.dx = -ball.dx;
+            }
+
+            if (ball.y + ball.dy < ball.radius) {
+                ball.dy = -ball.dy;
+            } else if (ball.y + ball.dy > canvas.height - ball.radius) {
+                if (ball.x > paddle.x && ball.x < paddle.x + paddle.width) {
+                    ball.dy = -ball.dy;
+                    score++;
+                } else {
+                    // Game over, reset the ball and paddle
+                    ball.x = canvas.width / 2;
+                    ball.y = canvas.height - 30;
+                    ball.dx = 2;
+                    ball.dy = -2;
+                    paddle.x = (canvas.width - paddleWidth) / 2;
+                    score = 0;
+                    gameStarted = false; // Reset game state
+                    startButton.disabled = false; // Enable start button
+                }
+            }
+
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            if (gameStarted) {
+                requestAnimationFrame(draw);
+            }
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowRight') {
+                rightPressed = true;
+            } else if (e.key === 'ArrowLeft') {
+                leftPressed = true;
+            }
+        });
+
+        document.addEventListener('keyup', function (e) {
+            if (e.key === 'ArrowRight') {
+                rightPressed = false;
+            } else if (e.key === 'ArrowLeft') {
+                leftPressed = false;
+            }
+        });
+
+        startButton.addEventListener('click', function () {
+            if (!gameStarted) {
+                gameStarted = true;
+                startButton.disabled = true; // Disable start button once game starts
+                draw();
+            }
+        });
+
+    </script>
+
+</body>
+
+</html>

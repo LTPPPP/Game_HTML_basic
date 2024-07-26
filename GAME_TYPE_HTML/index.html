@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #game-container {
+            width: 80%;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        #word-display {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        #input-field {
+            width: 300px;
+            height: 40px;
+            font-size: 18px;
+        }
+
+        #game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-container">
+        <h1>Typing Game</h1>
+        <div id="game-info">
+            <div id="score"></div>
+            <div id="timer"></div>
+        </div>
+        <div id="word-display"></div>
+        <input type="text" id="input-field" placeholder="Start typing...">
+        <button id="start-btn">Start Game</button>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        const words = ["apple", "banana", "orange", "grape", "strawberry", "kiwi", "pineapple", "melon", "blueberry", "peach", "plum", "pear", "cherry", "lemon", "lime", "raspberry", "apricot", "mango", "watermelon", "coconut"];
+
+        let wordIndex;
+        let startTime;
+        let endTime;
+        let correctWords;
+        let timerInterval;
+
+        const wordDisplay = document.getElementById('word-display');
+        const inputField = document.getElementById('input-field');
+        const startBtn = document.getElementById('start-btn');
+        const scoreDisplay = document.getElementById('score');
+        const timerDisplay = document.getElementById('timer');
+        const resultDisplay = document.getElementById('result');
+
+        startBtn.addEventListener('click', startGame);
+
+        function startGame() {
+            wordIndex = 0;
+            correctWords = 0;
+            resultDisplay.textContent = '';
+            scoreDisplay.textContent = 'Score: 0';
+
+            inputField.value = '';
+            inputField.focus();
+
+            generateWord();
+            startTime = Date.now();
+            updateTimer();
+            timerInterval = setInterval(updateTimer, 1000); // Update timer every second
+
+            // Set timeout for 30 seconds
+            setTimeout(endGame, 30000);
+        }
+
+        function generateWord() {
+            wordDisplay.textContent = words[Math.floor(Math.random() * words.length)];
+        }
+
+        inputField.addEventListener('input', checkInput);
+
+        function checkInput() {
+            const userInput = inputField.value.trim();
+            const currentWord = wordDisplay.textContent;
+
+            if (userInput === currentWord) {
+                correctWords++;
+                inputField.value = '';
+                generateWord();
+                scoreDisplay.textContent = `Score: ${correctWords}`;
+            }
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            endTime = Date.now();
+            const duration = (endTime - startTime) / 1000;
+            const wpm = Math.round((correctWords / duration) * 60);
+
+            resultDisplay.textContent = `You typed ${correctWords} words correctly in ${duration} seconds. Your typing speed is approximately ${wpm} words per minute.`;
+        }
+
+        function updateTimer() {
+            const currentTime = Math.max(0, Math.round((30000 - (Date.now() - startTime)) / 1000));
+            const minutes = Math.floor(currentTime / 60);
+            const seconds = currentTime % 60;
+            timerDisplay.textContent = `Time left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,4 @@
+reate me a 3-card card game, from a deck of 52 cards. 2 players, each person will be drawn 3 random cards, the total score will be whoever has the higher score wins, Cards: A, 2, 3, 4, 5, 6, 7, 8, 9, 10 Each card has a number of points corresponding to that number. Cards: J, Q, K each count ten points. When you reach 10 points, the score becomes 0. When the score > 10,the score takes the last digit of the total, print each person's score.
+Create an interface for the user: when drawing 3 cards, 3 cards will be displayed and placed face down. When pressing the open button, the card will be opened and the score displayed, player number 1 on the left, player number 2 On the right side, until both players have opened all their cards, the result will be printed as to who is the winner, only display result when open all card
+
+HTML, CSS, js

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+
+        #gameCanvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #222;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <script>
+        // Define variables
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const box = 20; // Size of each snake part
+        const speed = 150; // Speed of the game
+        let snake = [{ x: 10 * box, y: 10 * box }]; // Snake's initial position
+        let prey = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box }; // Prey's initial position
+        let score = 0;
+        let direction;
+
+        // Control the snake movement
+        document.addEventListener("keydown", (event) => {
+            const key = event.key;
+            if (key === "ArrowUp" && direction !== "DOWN") direction = "UP";
+            else if (key === "ArrowDown" && direction !== "UP") direction = "DOWN";
+            else if (key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+            else if (key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+        });
+
+        // Draw objects on canvas
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw snake
+            snake.forEach((part, index) => {
+                ctx.fillStyle = (index === 0) ? "white" : "green";
+                ctx.fillRect(part.x, part.y, box, box);
+                ctx.strokeStyle = "black";
+                ctx.strokeRect(part.x, part.y, box, box);
+            });
+
+            // Draw prey
+            ctx.fillStyle = "red";
+            ctx.fillRect(prey.x, prey.y, box, box);
+
+            // Draw score
+            ctx.fillStyle = "white";
+            ctx.font = "20px Arial";
+            ctx.fillText("Score: " + score, 10, 30);
+
+            // Move the snake
+            let head = { x: snake[0].x, y: snake[0].y };
+            if (direction === "UP") head.y -= box;
+            else if (direction === "DOWN") head.y += box;
+            else if (direction === "LEFT") head.x -= box;
+            else if (direction === "RIGHT") head.x += box;
+
+            // Check if snake eats prey
+            if (head.x === prey.x && head.y === prey.y) {
+                score++;
+                prey = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
+            } else snake.pop();
+
+            // Check if game ends
+            if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height || checkCollision(head, snake)) {
+                clearInterval(game);
+                alert("Game over! Your score: " + score);
+                location.reload(); // Restart the game
+            }
+
+            snake.unshift(head); // Add new head
+
+        }
+
+        // Check if snake collides with itself
+        function checkCollision(head, array) {
+            for (let i = 0; i < array.length; i++) {
+                if (head.x === array[i].x && head.y === array[i].y) return true;
+            }
+            return false;
+        }
+
+        // Run the game
+        let game = setInterval(draw, speed);
+    </script>
+</body>
+
+</html>

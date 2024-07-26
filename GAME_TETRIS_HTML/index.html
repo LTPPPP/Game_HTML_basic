@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #game-board {
+            width: 200px;
+            height: 400px;
+            border: 2px solid black;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .cell {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            position: absolute;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-board"></div>
+    <script>
+        const ROWS = 20;
+        const COLS = 10;
+        const CELL_SIZE = 20;
+        const board = [];
+        let currentPiece;
+        let intervalId;
+
+        function initBoard() {
+            for (let i = 0; i < ROWS; i++) {
+                board[i] = [];
+                for (let j = 0; j < COLS; j++) {
+                    board[i][j] = 0;
+                }
+            }
+        }
+
+        function drawBoard() {
+            const gameBoard = document.getElementById('game-board');
+            gameBoard.innerHTML = '';
+            for (let i = 0; i < ROWS; i++) {
+                for (let j = 0; j < COLS; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.style.top = i * CELL_SIZE + 'px';
+                    cell.style.left = j * CELL_SIZE + 'px';
+                    if (board[i][j]) {
+                        cell.style.backgroundColor = 'black';
+                    }
+                    // Check if the cell is part of the current piece and set its background color to pink
+                    if (currentPiece && i >= currentPieceRow && i < currentPieceRow + currentPiece.length &&
+                        j >= currentPieceCol && j < currentPieceCol + currentPiece[0].length &&
+                        currentPiece[i - currentPieceRow][j - currentPieceCol]) {
+                        cell.style.backgroundColor = 'pink';
+                    }
+                    gameBoard.appendChild(cell);
+                }
+            }
+        }
+
+
+        function clearBoard() {
+            for (let i = 0; i < ROWS; i++) {
+                for (let j = 0; j < COLS; j++) {
+                    board[i][j] = 0;
+                }
+            }
+        }
+
+        function pieceFits(piece, row, col) {
+            for (let i = 0; i < piece.length; i++) {
+                for (let j = 0; j < piece[i].length; j++) {
+                    if (piece[i][j] && (row + i >= ROWS || col + j < 0 || col + j >= COLS || board[row + i][col + j])) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        function placePiece(piece, row, col) {
+            for (let i = 0; i < piece.length; i++) {
+                for (let j = 0; j < piece[i].length; j++) {
+                    if (piece[i][j]) {
+                        board[row + i][col + j] = 1;
+                    }
+                }
+            }
+        }
+
+        function removeCompletedRows() {
+            for (let i = ROWS - 1; i >= 0; i--) {
+                if (!board[i].includes(0)) {
+                    board.splice(i, 1);
+                    board.unshift(Array(COLS).fill(0));
+                }
+            }
+        }
+
+        function rotatePiece(piece) {
+            const rotatedPiece = [];
+            for (let i = 0; i < piece[0].length; i++) {
+                rotatedPiece[i] = [];
+                for (let j = 0; j < piece.length; j++) {
+                    rotatedPiece[i][j] = piece[piece.length - 1 - j][i];
+                }
+            }
+            return rotatedPiece;
+        }
+
+        function getRandomPiece() {
+            const pieces = [
+                [[1, 1, 1, 1]],
+                [[1, 1], [1, 1]],
+                [[1, 0, 0], [1, 1, 1]],
+                [[0, 0, 1], [1, 1, 1]],
+                [[0, 1, 1], [1, 1, 0]],
+                [[1, 1, 0], [0, 1, 1]],
+                [[1, 1, 1], [0, 1, 0]]
+            ];
+            return pieces[Math.floor(Math.random() * pieces.length)];
+        }
+
+        function movePieceDown() {
+            if (pieceFits(currentPiece, currentPieceRow + 1, currentPieceCol)) {
+                currentPieceRow++;
+            } else {
+                placePiece(currentPiece, currentPieceRow, currentPieceCol);
+                removeCompletedRows();
+                currentPiece = getRandomPiece();
+                currentPieceRow = 0;
+                currentPieceCol = Math.floor(COLS / 2) - Math.floor(currentPiece[0].length / 2);
+                if (!pieceFits(currentPiece, currentPieceRow, currentPieceCol)) {
+                    clearInterval(intervalId);
+                    alert('Game Over! Press Enter to play again.');
+                    clearBoard();
+                    initGame();
+                }
+            }
+            drawBoard(); // Redraw the board after placing the piece
+        }
+
+
+        function movePieceLeft() {
+            if (pieceFits(currentPiece, currentPieceRow, currentPieceCol - 1)) {
+                currentPieceCol--;
+                drawBoard();
+            }
+        }
+
+        function movePieceRight() {
+            if (pieceFits(currentPiece, currentPieceRow, currentPieceCol + 1)) {
+                currentPieceCol++;
+                drawBoard();
+            }
+        }
+
+        function rotateCurrentPiece() {
+            const rotatedPiece = rotatePiece(currentPiece);
+            if (pieceFits(rotatedPiece, currentPieceRow, currentPieceCol)) {
+                currentPiece = rotatedPiece;
+                drawBoard();
+            }
+        }
+
+        function initGame() {
+            initBoard();
+            currentPiece = getRandomPiece();
+            currentPieceRow = 0;
+            currentPieceCol = Math.floor(COLS / 2) - Math.floor(currentPiece[0].length / 2);
+            intervalId = setInterval(movePieceDown, 500);
+            drawBoard();
+        }
+
+        document.addEventListener('keydown', function (event) {
+            switch (event.keyCode) {
+                case 13: // Enter key
+                    initGame();
+                    break;
+                case 37: // Left arrow key
+                    movePieceLeft();
+                    break;
+                case 39: // Right arrow key
+                    movePieceRight();
+                    break;
+                case 38: // Up arrow key
+                    rotateCurrentPiece();
+                    break;
+                case 40: // Down arrow key
+                    movePieceDown();
+                    break;
+            }
+        });
+    </script>
+</body>
+
+</html>

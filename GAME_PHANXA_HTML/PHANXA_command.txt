@@ -1,0 +1,2 @@
+Build me a timed reflex game, there is a red block in the middle of the screen, the random time is from 10s to 30s, then that block turns green, when clicked, the time will change from green to green. How long does it take to press and display the results on the screen? When the block hasn't changed color, if you press it, you lose the game. Press the start button to start the game.
+html,css,js

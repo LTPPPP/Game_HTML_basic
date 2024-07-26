@@ -1,0 +1,2 @@
+Base on game”ping pong 2d” build for me a game with 1 player vs computer, using right and left key to move, press button to start the game and play again, when player hit 1 then +1 to scoreBase on game”ping pong 2d” build for me a game with 1 player vs computer, using right and left key to move, press button to start the game and play again, when player hit 1 then +1 to score
+html, css, js
